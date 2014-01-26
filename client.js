@@ -1,25 +1,5 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>WebRTC Demo</title>
-  </head>
-  <body>
 
-    <h1>WebRTC Demo using Socket.IO</h1>
-    <video id="webrtc-sourcevid" autoplay style="width: 320px; height: 240px; border: 1px solid black;"></video>
-    <button type="button" onclick="startVideo()">Start video</button>
-    <button type="button" onclick="stopVideo()">Stop video</button>
-
-    <video id="webrtc-remotevid" autoplay style="width: 320px; height: 240px; border: 1px solid black;"></video>
-    <button type="button" onclick="connect()">Connect</button>
-    <button type="button" onclick="hangUp()">Hang Up</button>
-
-    <p>Run a node.js server and adapt the address in the code.</p>
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-      // create socket
-var socket = io.connect('http://localhost:1337/');
-
+var socket = io.connect('http://192.168.0.10:1337/');
 var sourcevid = document.getElementById('webrtc-sourcevid');
 var remotevid = document.getElementById('webrtc-remotevid');
 var localStream = null;
@@ -77,21 +57,29 @@ function setLocalAndSendMessage(sessionDescription) {
 }
 
 function createOfferFailed() {
+    started = false;
     console.log("Create Answer failed");
+    alert("CreateOfferFailed: cannot connect to remote");
 }
 
-// start the connection upon user request
 function connect() {
-    if (!started && localStream && channelReady) {
-	createPeerConnection();
-	started = true;
-	peerConn.createOffer(setLocalAndSendMessage, createOfferFailed, mediaConstraints);
+    if (!started) {
+	if (localStream) {
+	    if (channelReady) {
+		createPeerConnection();
+		started = true;
+		peerConn.createOffer(setLocalAndSendMessage, createOfferFailed, mediaConstraints);
+	    } else {
+		alert("channel not ready");
+	    }
+	} else {
+	    alert("Local stream not running");
+	}
     } else {
-	alert("Local stream not running yet - try again.");
+	alert("alreadey connected: started is true");
     }
 }
 
-// stop the connection upon user request
 function hangUp() {
     console.log("Hang up.");
     socket.json.send({type: "bye"});
@@ -104,7 +92,6 @@ function stop() {
     started = false;
 }
 
-// socket: channel connected
 socket.on('connect', onChannelOpened).on('message', onMessage);
 function onChannelOpened(evt) {
     console.log('Channel opened.');
@@ -183,6 +170,3 @@ function createPeerConnection() {
 	remotevid.src = "";
     }
 }
-    </script>
-  </body>
-</html>
