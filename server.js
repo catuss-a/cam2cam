@@ -4,11 +4,13 @@ var app		= express();
 var server	= require('http').createServer(app);
 var io		= require('socket.io').listen(server);
 
-app.use(express.static(__dirname + '/'));
-
-app.get('/', function(req, res) {
-    res.sendfile(__dirname + '/index.html');
-});
+app.use(app.router)
+    .use(express.static(__dirname + '/public/'))
+    .get('/', function(req, res) {
+	console.log(server.address());
+	console.log('client co from : ' + req.connection.remoteAddress);
+	res.sendfile(__dirname + '/public/index.html');
+    });
 
 // Dummy db
 allSockets = [];
@@ -38,11 +40,15 @@ io.sockets.on('connection', function(socket) {
     });
 
     socket.on('disconnect', function() {
+	if (allSockets[0] == socket) {
+	    allSockets.pop();
+	} else {
+	    allSockets.push(qmSocket[socket.id]);
+	}
         // close user connection
         console.log((new Date()) + " Peer disconnected.");
         socket.broadcast.emit('user disconnected');
     });
-
 });
 
 server.listen(1337, function() {
