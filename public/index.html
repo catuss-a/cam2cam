@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Cam2Cam</title>
+  </head>
+  <body>
+    <h1>Cam2Cam using Socket.IO</h1>
+    <video id="webrtc-sourcevid" autoplay style="width: 320px; height: 240px; border: 1px solid black;"></video>
+    <button type="button" onclick="startVideo()">Start video</button>
+    <button type="button" onclick="stopVideo()">Stop video</button>
+
+    <video id="webrtc-remotevid" autoplay style="width: 320px; height: 240px; border: 1px solid black;"></video>
+    <button type="button" onclick="connect()">Connect</button>
+    <button type="button" onclick="hangUp()">Hang Up</button>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="./client.js"></script>
+  </body>
+</html>
